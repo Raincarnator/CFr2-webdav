@@ -1,30 +1,24 @@
-name: Deploy to Cloudflare Workers
+name: Check
 
 on:
   push:
-    branches:
-      - main
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
-  deploy:
+  worker:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Create wrangler.toml
-        env:
-          USERNAME: ${{ secrets.USERNAME || '_user' }}
-          PASSWORD: ${{ secrets.PASSWORD || '_pass' }}
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME || 'bucket' }}
-        run: |
-          sed -e "s/\$USERNAME/$USERNAME/g" \
-              -e "s/\$PASSWORD/$PASSWORD/g" \
-              -e "s/\$BUCKET_NAME/$BUCKET_NAME/g" \
-              wrangler.toml.template > wrangler.toml
-          cat wrangler.toml
-
-      - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3
+      - uses: actions/checkout@v7
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test

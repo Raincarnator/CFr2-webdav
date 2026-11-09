@@ -1,0 +1,14 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "webdav",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-11-09",
+	"workers_dev": true,
+	"preview_urls": false,
+	"secrets": { "required": ["USERNAME", "PASSWORD"] },
+	"r2_buckets": [{ "binding": "BUCKET" }],
+	"durable_objects": {
+		"bindings": [{ "name": "DAV", "class_name": "WebDAV" }],
+	},
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["WebDAV"] }],
+}
